@@ -9,9 +9,8 @@ The model is implemented using TensorFlow and Keras using the MNIST dataset of h
 * TkInter
 * Pillow (PIL)
 * NumPy
-* Matplotlib
 * SciPy
-
+* Matplotlib
 
 ## Instructions
 Run main.py to start the application.
