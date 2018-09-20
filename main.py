@@ -58,6 +58,7 @@
 
         # Extract and pre-process digit
         def process_image(self):
+
             # Extract image from canvas
             x = self.c.winfo_rootx()+2
             y = self.c.winfo_rooty()+2
@@ -65,11 +66,14 @@
             y1 = y + self.c.winfo_height()-4
             img = ImageGrab.grab().crop((x, y, x1, y1)).convert('L')
 
+            # Setup plot
             plt.figure(6, (8, 6))
             plt.arrow(20, 2, 0.5, 0.5)
             plt.suptitle("Image pre-processing", fontsize=18)
             plt.subplots_adjust(wspace=0.3, hspace=0.3)
             plt.cla()
+
+            # Plot the original image extracted from canvas
             plt.subplot(2, 4, 1)
             plt.title("Original")
             plt.imshow(img)
@@ -88,47 +92,48 @@
             while np.sum(arr[:, maxX-2:]) == 0:
                 maxX -= 1
 
-            extracted = img.crop((x, y, maxX, maxY))
+            # Plot the cropped image
+            cropped = img.crop((x, y, maxX, maxY))
             plt.subplot(2, 4, 2)
             plt.title("Cropped")
-            plt.imshow(extracted)
+            plt.imshow(cropped)
 
             # Down-scale image while keeping aspect ratio
-            rows, cols = extracted.height, extracted.width
+            rows, cols = cropped.height, cropped.width
             if rows > cols:
                 factor = 20.0 / rows
                 rows = 20
                 cols = int(round(cols * factor))
-                extracted = extracted.resize((cols, rows), Image.ANTIALIAS)
+                cropped = cropped.resize((cols, rows), Image.ANTIALIAS)
             else:
                 factor = 20.0 / cols
                 cols = 20
                 rows = int(round(rows * factor))
-                extracted = extracted.resize((cols, rows), Image.ANTIALIAS)
+                cropped = cropped.resize((cols, rows), Image.ANTIALIAS)
 
             # Paste the digit onto a black 28x28 image
-            processed = Image.new("L", (28, 28))
-            processed.paste(extracted, (4, 4))
+            downscaled = Image.new("L", (28, 28))
+            downscaled.paste(cropped, (4, 4))
 
+            # Plot the downscaled image
             plt.subplot(2, 4, 3)
             plt.title("Downscaled")
-            plt.imshow(processed)
+            plt.imshow(downscaled)
 
-
-            # Downscale pixel values to a range of 0 to 1
-            processed = np.array(processed) / 255.0
+            # Scale pixel values to a range of 0 to 1
+            centered = np.array(downscaled) / 255.0
 
             # Center digit in image using Center of Mass
-            c1 = ndimage.center_of_mass(np.ones_like(processed))
-            cm = ndimage.center_of_mass(processed)
-            processed = np.roll(processed, int(round((c1[0] - cm[0]))), axis=0)
-            processed = np.roll(processed, int(round((c1[1] - cm[1]))), axis=1)
+            c1 = ndimage.center_of_mass(np.ones_like(centered))
+            cm = ndimage.center_of_mass(centered)
+            centered = np.roll(centered, int(round((c1[0] - cm[0]))), axis=0)
+            centered = np.roll(centered, int(round((c1[1] - cm[1]))), axis=1)
 
             plt.subplot(2, 4, 4)
             plt.title("Centered")
-            plt.imshow(processed, cmap='gray')
+            plt.imshow(centered, cmap='gray')
 
-            return processed
+            return centered
 
         def guess_digit(self, event):
             self.old_x, self.old_y = None, None
