@@ -69,6 +69,7 @@ class GUI(object):
 
         ax4 = plt.subplot2grid((2, 3), (1, 0), colspan=3)
         ax4.set_title("Probabilities", fontsize=18)
+        ax4.set_xticks(np.arange(10))
         ax4.bar(np.arange(10), 0, 0.2)
 
         self.figure = plt.gcf()
@@ -171,10 +172,10 @@ class GUI(object):
         self.change_text(prediction[0])
 
         # Plot image and prediction rates
-        self.bar.cla()
         p = np.power(p, (1 / 10))
-        plt.xticks(np.arange(len(p[0])))
+        self.bar.cla()
         self.bar.bar(np.arange(len(p[0])), p[0], 0.2)
+        self.bar.set_xticks(np.arange(10))
         self.fig_photo = draw_figure(self.canvas2, self.figure)
 
 
