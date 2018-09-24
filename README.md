@@ -11,6 +11,7 @@ The model is implemented using TensorFlow and Keras using the MNIST dataset of h
 * NumPy
 * SciPy
 * Matplotlib
+* H5py
 
 ## Instructions
 Run main.py to start the application.
