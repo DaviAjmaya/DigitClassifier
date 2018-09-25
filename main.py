@@ -95,9 +95,9 @@ class GUI(object):
         empty_image = Image.new('L', (28, 28))
         for i in range(len(self.image_axes)):
             self.image_axes[i].imshow(empty_image)
-        #self.probability_bar.cla()
+        self.probability_bar.cla()
         self.probability_bar.set_xticks(np.arange(10))
-        #self.probability_bar.set_title("Probabilities", fontsize=16)
+        self.probability_bar.set_title("Probabilities", fontsize=16)
         self.fig_photo = draw_figure(self.canvas2, self.figure)
 
     def paint(self, event):
@@ -173,10 +173,10 @@ class GUI(object):
         # Plot image and prediction rates
         p = np.power(p, (1 / 10))
         self.probability_bar.cla()
-        #self.probability_bar.set_title("Probabilities", fontsize=16)
+        self.probability_bar.set_title("Probabilities", fontsize=16)
         self.probability_bar.bar(np.arange(len(p[0])), p[0], 0.2)
-        #self.probability_bar.set_xticks(np.arange(10))
-        self.figure2
+        self.probability_bar.set_xticks(np.arange(10))
+        self.fig_photo = draw_figure(self.canvas2, self.figure)
 
 
 if __name__ == "__main__":
