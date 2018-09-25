@@ -30,7 +30,7 @@ class GUI(object):
         self.root.resizable(width=False, height=False)
 
         # GUI widgets
-        self.choose_size_button = Scale(self.root, from_=12, to=20, width=12, orient=HORIZONTAL, length=80)
+        self.choose_size_button = Scale(self.root, from_=12, to=20, width=15, orient=HORIZONTAL, length=80, font=("", 12))
         self.choose_size_button.grid(row=0, column=0, sticky=E)
 
         self.clear_button = Button(self.root, text='Clear', font=("", 12), command=self.use_clear)
@@ -39,8 +39,8 @@ class GUI(object):
         self.canvas = Canvas(self.root, bg='white', width=168, height=168)
         self.canvas.grid(row=1, column=1, columnspan=1, padx=100, sticky=W)
 
-        self.Text = Label(self.root, text="", font=("", 20))
-        self.Text.grid(row=0, column=1, sticky=W, padx=180)
+        self.Text = Label(self.root, text="", font=("", 20), width=2)
+        self.Text.grid(row=0, column=1, sticky=W, padx=165)
 
         self.old_x = None
         self.old_y = None
@@ -60,11 +60,11 @@ class GUI(object):
 
         ax4 = plt.subplot2grid((2, 3), (1, 0), colspan=3)
 
-        self.images = [ax1, ax2, ax3]
-        self.bar = ax4
+        self.image_axes = [ax1, ax2, ax3]
+        self.probability_bar = ax4
 
-        for i in range(len(self.images)):
-            self.images[i].axis('off')
+        for i in range(len(self.image_axes)):
+            self.image_axes[i].axis('off')
 
         self.figure = plt.gcf()
         self.fig_photo = draw_figure(self.canvas2, self.figure)
@@ -93,11 +93,11 @@ class GUI(object):
 
     def clear_plots(self):
         empty_image = Image.new('L', (28, 28))
-        for i in range(len(self.images)):
-            self.images[i].imshow(empty_image)
-        self.bar.cla()
-        self.bar.set_xticks(np.arange(10))
-        self.bar.set_title("Probabilities", fontsize=16)
+        for i in range(len(self.image_axes)):
+            self.image_axes[i].imshow(empty_image)
+        #self.probability_bar.cla()
+        self.probability_bar.set_xticks(np.arange(10))
+        #self.probability_bar.set_title("Probabilities", fontsize=16)
         self.fig_photo = draw_figure(self.canvas2, self.figure)
 
     def paint(self, event):
@@ -129,7 +129,7 @@ class GUI(object):
             return
 
         # Plot inverted image
-        self.images[0].imshow(img)
+        self.image_axes[0].imshow(img)
 
         # Crop image
         cropped = img.crop(bounding_box)
@@ -152,7 +152,7 @@ class GUI(object):
         centered = Image.new("L", (28, 28))
         centered.paste(downscaled, (4, 4))
 
-        self.images[1].imshow(centered)
+        self.image_axes[1].imshow(centered)
 
         # Scale pixel values to a range of 0 to 1
         centered = np.array(centered) / 255.0
@@ -162,7 +162,7 @@ class GUI(object):
         cm = ndimage.center_of_mass(centered)
         centered = np.roll(centered, int(round((c1[0] - cm[0]))), axis=0)
         centered = np.roll(centered, int(round((c1[1] - cm[1]))), axis=1)
-        self.images[2].imshow(centered, cmap='gray')
+        self.image_axes[2].imshow(centered, cmap='gray')
 
         # Get the model's prediction
         inp = np.reshape(centered, (1, 28, 28))
@@ -172,11 +172,11 @@ class GUI(object):
 
         # Plot image and prediction rates
         p = np.power(p, (1 / 10))
-        self.bar.cla()
-        self.bar.set_title("Probabilities", fontsize=16)
-        self.bar.bar(np.arange(len(p[0])), p[0], 0.2)
-        self.bar.set_xticks(np.arange(10))
-        self.fig_photo = draw_figure(self.canvas2, self.figure)
+        self.probability_bar.cla()
+        #self.probability_bar.set_title("Probabilities", fontsize=16)
+        self.probability_bar.bar(np.arange(len(p[0])), p[0], 0.2)
+        #self.probability_bar.set_xticks(np.arange(10))
+        self.figure2
 
 
 if __name__ == "__main__":
