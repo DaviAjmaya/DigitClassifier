@@ -49,6 +49,7 @@ class GUI(object):
         self.canvas2.grid(row=2, columnspan=3)
 
         # Setup plots
+        plt.suptitle("Pre-processing steps", fontsize=16)
         ax1 = plt.subplot2grid((2, 3), (0, 0), colspan=1)
         ax1.set_title("Inverted")
 
