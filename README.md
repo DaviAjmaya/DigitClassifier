@@ -4,8 +4,8 @@ The drawing application is implemented using the Python library TkInter.
 
 The model is implemented using TensorFlow (Keras) and is trained using the MNIST dataset of handwritten digits.
 
-## Screenshot of the application
-![Screenshot](/Screenshot.PNG?raw=true "Screenshot of the application")
+## Screenshot
+![Screenshot](/Screenshot.PNG?raw=true "Screenshot")
 
 ## Required libraries
 * TensorFlow
