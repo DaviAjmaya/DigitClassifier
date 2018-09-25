@@ -4,7 +4,6 @@ from PIL import Image, ImageGrab, ImageOps
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import ndimage
-import matplotlib
 import matplotlib.backends.tkagg as tkagg
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
@@ -38,10 +37,10 @@ class GUI(object):
         self.clear_button.grid(row=0, column=2, sticky=W)
 
         self.canvas = Canvas(self.root, bg='white', width=168, height=168)
-        self.canvas.grid(row=1, column=1, columnspan=1)
+        self.canvas.grid(row=1, column=1, columnspan=1, padx=100, sticky=W)
 
         self.Text = Label(self.root, text="", font=("", 20))
-        self.Text.grid(row=0, columnspan=3)
+        self.Text.grid(row=0, column=1, sticky=W, padx=180)
 
         self.old_x = None
         self.old_y = None
@@ -50,40 +49,33 @@ class GUI(object):
         self.canvas2.grid(row=2, columnspan=3)
 
         # Setup plots
-        dummy_image = Image.new('L', (28, 28))
-
         ax1 = plt.subplot2grid((2, 3), (0, 0), colspan=1)
         ax1.set_title("Inverted")
-        ax1.imshow(dummy_image)
-        ax1.axis('off')
 
         ax2 = plt.subplot2grid((2, 3), (0, 1), colspan=1)
         ax2.set_title("Cropped & downscaled")
-        ax2.imshow(dummy_image)
-        ax2.axis('off')
 
         ax3 = plt.subplot2grid((2, 3), (0, 2), colspan=1)
         ax3.set_title("Centered")
-        ax3.imshow(dummy_image)
-        ax3.axis('off')
 
         ax4 = plt.subplot2grid((2, 3), (1, 0), colspan=3)
-        ax4.set_title("Probabilities", fontsize=18)
-        ax4.set_xticks(np.arange(10))
-        ax4.bar(np.arange(10), 0, 0.2)
-
-        self.figure = plt.gcf()
-        self.fig_photo = draw_figure(self.canvas2, self.figure)
-        plt.close()
 
         self.images = [ax1, ax2, ax3]
         self.bar = ax4
+
+        for i in range(len(self.images)):
+            self.images[i].axis('off')
+
+        self.figure = plt.gcf()
+        self.fig_photo = draw_figure(self.canvas2, self.figure)
+        self.clear_plots()
 
         # Load model
         print("Restoring model...")
         self.model = tf.keras.models.load_model('model.h5')
         print("Model restored...")
 
+        # Run tkinter main loop
         self.setup()
         self.root.mainloop()
 
@@ -94,16 +86,25 @@ class GUI(object):
     def use_clear(self):
         self.canvas.delete("all")
         self.change_text("")
+        self.clear_plots()
 
     def change_text(self, text=""):
         self.Text['text'] = text
 
+    def clear_plots(self):
+        empty_image = Image.new('L', (28, 28))
+        for i in range(len(self.images)):
+            self.images[i].imshow(empty_image)
+        self.bar.cla()
+        self.bar.set_xticks(np.arange(10))
+        self.bar.set_title("Probabilities", fontsize=16)
+        self.fig_photo = draw_figure(self.canvas2, self.figure)
+
     def paint(self, event):
         line_width = self.choose_size_button.get()
         if self.old_x and self.old_y:
-            self.canvas.create_line(self.old_x, self.old_y, event.x, event.y,
-                                    width=line_width, fill='black',
-                                    capstyle=ROUND, smooth=TRUE, splinesteps=36)
+            self.canvas.create_line(self.old_x, self.old_y, event.x, event.y, width=line_width,
+                                    fill='black', capstyle=ROUND, smooth=TRUE, splinesteps=36)
         self.old_x = event.x
         self.old_y = event.y
 
@@ -116,24 +117,22 @@ class GUI(object):
         x1 = x + self.canvas.winfo_width() - 4
         y1 = y + self.canvas.winfo_height() - 4
         img = ImageGrab.grab().crop((x, y, x1, y1)).convert('L')
+
+        # Invert image
         img = ImageOps.invert(img)
-        self.images[0].imshow(img)  # Plot inverted image
+
+        # Get bounding box
+        bounding_box = img.getbbox()
+
+        # If image is blank (nothing is drawn)
+        if not bounding_box:
+            return
+
+        # Plot inverted image
+        self.images[0].imshow(img)
 
         # Crop image
-        arr = np.array(img)
-        x, y = 0, 0
-        max_x, max_y = arr.shape[0] - 1, arr.shape[1] - 1
-
-        while np.sum(arr[:y + 2]) == 0:
-            y += 1
-        while np.sum(arr[max_y - 2:]) == 0:
-            max_y -= 1
-        while np.sum(arr[:, :x + 2]) == 0:
-            x += 1
-        while np.sum(arr[:, max_x - 2:]) == 0:
-            max_x -= 1
-
-        cropped = img.crop((x, y, max_x, max_y))
+        cropped = img.crop(bounding_box)
 
         # Down-scale image while keeping aspect ratio
         downscaled = cropped
@@ -174,6 +173,7 @@ class GUI(object):
         # Plot image and prediction rates
         p = np.power(p, (1 / 10))
         self.bar.cla()
+        self.bar.set_title("Probabilities", fontsize=16)
         self.bar.bar(np.arange(len(p[0])), p[0], 0.2)
         self.bar.set_xticks(np.arange(10))
         self.fig_photo = draw_figure(self.canvas2, self.figure)
