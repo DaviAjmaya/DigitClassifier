@@ -2,7 +2,7 @@
 A drawing application that classifies digits in real time using machine learning.
 The drawing application is implemented using the Python library TkInter.
 
-The model is implemented using TensorFlow and Keras using the MNIST dataset of handwritten digits.
+The model is implemented using TensorFlow (Keras) and is trained using the MNIST dataset of handwritten digits.
 
 ### Required libraries
 * TensorFlow
