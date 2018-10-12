@@ -30,8 +30,12 @@ class GUI(object):
         self.root.resizable(width=False, height=False)
 
         # GUI widgets
-        self.choose_size_button = Scale(self.root, from_=12, to=20, width=15, orient=HORIZONTAL, length=80, font=("", 12))
+        self.choose_size_button = Scale(self.root, from_=10, to=24, width=15, orient=HORIZONTAL, length=80, font=("", 12))
         self.choose_size_button.grid(row=0, column=0, sticky=E)
+        self.choose_size_button.set(12)
+
+        self.size_text = Label(self.root, text="Brush size", font=("", 12), width=10)
+        self.size_text.grid(row=1, column=0, sticky=NE)
 
         self.clear_button = Button(self.root, text='Clear', font=("", 12), command=self.use_clear)
         self.clear_button.grid(row=0, column=2, sticky=W)
@@ -46,7 +50,7 @@ class GUI(object):
         self.old_y = None
 
         self.canvas2 = Canvas(self.root, width=700, height=600)
-        self.canvas2.grid(row=2, columnspan=3)
+        self.canvas2.grid(row=2, columnspan=3, pady=20)
 
         # Setup plots
         plt.suptitle("Pre-processing steps", fontsize=16)
@@ -166,13 +170,13 @@ class GUI(object):
         self.image_axes[2].imshow(centered, cmap='gray')
 
         # Get the model's prediction
-        inp = np.reshape(centered, (1, 28, 28))
+        inp = np.reshape(centered, (1, 28, 28, 1))
         prediction = self.model.predict_classes(inp)
         p = self.model.predict(inp)
         self.change_text(prediction[0])
 
         # Plot image and prediction rates
-        p = np.power(p, (1 / 10))
+        p = np.power(p, (1 / 5))
         self.probability_bar.cla()
         self.probability_bar.set_title("Probabilities", fontsize=16)
         self.probability_bar.bar(np.arange(len(p[0])), p[0], 0.2)
