@@ -50,10 +50,10 @@ model.fit(x_train, y_train,
           verbose=2,
           validation_data=(x_test, y_test))
 
-# Test model
-score = model.evaluate(x_test, y_test, verbose=2)
 
 model.save('model.h5')
 
+# Test model
+score = model.evaluate(x_test, y_test, verbose=2)
 print('Test loss:', score[0])
 print('Test accuracy:', score[1])
