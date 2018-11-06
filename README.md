@@ -20,6 +20,3 @@ The model is implemented using TensorFlow (Keras) and is trained using the MNIST
 Run main.py to start the application.
 The model is trained and saved in model.h5. The model is automatically loaded once main.py runs.
 To re-train the model, run model.py
-
-## Known bugs
-*None*
